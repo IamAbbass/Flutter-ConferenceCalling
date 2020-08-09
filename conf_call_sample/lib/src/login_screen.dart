@@ -34,7 +34,7 @@ class BodyState extends State<BodyLayout> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(48),
+      padding: EdgeInsets.all(36),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

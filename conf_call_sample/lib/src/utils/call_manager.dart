@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:connectycube_sdk/connectycube_chat.dart';
 
-const NO_ANSWER_TIMER_INTERVAL = 30;
+const NO_ANSWER_TIMER_INTERVAL = 3600;
 
 class CallManager {
   SystemMessagesManager _systemMessagesManager;

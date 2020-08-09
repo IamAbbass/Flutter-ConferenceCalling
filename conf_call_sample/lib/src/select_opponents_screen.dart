@@ -100,66 +100,101 @@ class _BodyLayoutState extends State<BodyLayout> {
 
   _BodyLayoutState(this.currentUser);
 
+  TextEditingController _c = new TextEditingController();
+  String _text = "";
+  
+
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.all(48),
+        padding: EdgeInsets.all(24),
         child: Column(
           children: [
-            Text(
-              "Select users to start call:",
-              style: TextStyle(fontSize: 22),
+            Center(
+              child: RaisedButton(
+                color: Colors.white,
+                padding: EdgeInsets.all(24),                
+                child: Text("Start Conference Call", style: TextStyle(fontSize: 18, color: Colors.black),),
+                onPressed: () => _startCall(joinRoomId),
+              ),
             ),
-            Expanded(
-              child: _getOpponentsList(context),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                  FloatingActionButton(
-                    heroTag: "VideoCall",
-                    child: Icon(
-                      Icons.videocam,
-                      color: Colors.white,
-                    ),
-                    backgroundColor: Colors.blue,
-                    onPressed: () =>
-                        _startCall(_selectedUsers),
-                  ),
-              ],
+            Text("Your Room ID: ${joinRoomId}", style: TextStyle(fontSize: 20)),
+            SizedBox(height:24),
+            Center(
+              child: RaisedButton(
+                color: Colors.white,
+                padding: EdgeInsets.all(24),  
+                child: Text("Join Conference Call", style: TextStyle(fontSize: 18, color: Colors.black),),
+                onPressed: (){
+                 showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Join"),
+                      content:
+                          new TextField(
+                            autofocus: true,
+                            decoration: new InputDecoration(hintText: "Room ID"),
+                            keyboardType: TextInputType.number,
+                            controller: _c,
+                        ),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text("CANCEL"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        FlatButton(
+                          child: Text("JOIN"),
+                          onPressed: () async {
+                            Navigator.pop(context);
+
+                            if(_c.text == "1500908" || 
+                            _c.text == "1500909" || 
+                            _c.text == "1500911" ||
+                            _c.text == "1500912" || 
+                            _c.text == "1500913" || 
+                            _c.text == "1500914" || 
+                            _c.text == "1500915" || 
+                            _c.text == "1500916" || 
+                            _c.text == "1500917" || 
+                            _c.text == "1500918" || 
+                            _c.text == "1758581" || 
+                            _c.text == "1758587"){
+                              //_currentCall.joinDialog(_c.text, (publishers){
+                                _startCall(_c.text);
+                              //});                              
+                            }else{
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Invalid Room ID"),
+                                    content: Text("The Room ID you entered is invalid!"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text("OK"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }                            
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ); 
+                },
+              ),
             ),
           ],
         ));
-  }
-
-  Widget _getOpponentsList(BuildContext context) {
-    CubeUser currentUser = CubeChatConnection.instance.currentUser;
-    final users =
-    utils.users.where((user) => user.id != currentUser.id).toList();
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        return Card(
-          child: CheckboxListTile(
-            title: Center(
-              child: Text(
-                users[index].fullName,
-              ),
-            ),
-            value: _selectedUsers.contains(users[index].id),
-            onChanged: ((checked) {
-              setState(() {
-                if (checked) {
-                  _selectedUsers.add(users[index].id);
-                } else {
-                  _selectedUsers.remove(users[index].id);
-                }
-              });
-            }),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -168,6 +203,7 @@ class _BodyLayoutState extends State<BodyLayout> {
     _initConferenceConfig();
     _initCalls();
     joinRoomId = currentUser.id.toString();
+    print("joinRoomId: ${joinRoomId}");
   }
 
   void _initCalls() {
@@ -176,20 +212,27 @@ class _BodyLayoutState extends State<BodyLayout> {
     _callManager.onReceiveNewCall = (roomId, participantIds) {
       _showIncomingCallScreen(roomId, participantIds);
     };
-
     _callManager.onCloseCall = () {
         _currentCall = null;
     };
   }
 
-  void _startCall(Set<int> opponents) async {
-    if (opponents.isEmpty) return;
+  void _startCall(String roomId) async {
+    
+    List<int> opponents = new List<int>();
+
+    CubeUser currentUser = CubeChatConnection.instance.currentUser;
+    final users = utils.users.where((user) => user.id != currentUser.id).toList();
+    for(var i = 0; i < users.length; i++){
+        opponents.add(users[i].id);
+    }
+
     _currentCall = await _callClient.createCallSession(currentUser.id);
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ConversationCallScreen(_currentCall, joinRoomId, opponents.toList(), false),
+        builder: (context) => ConversationCallScreen(_currentCall, roomId, opponents.toList(), false),
       ),
     );
   }

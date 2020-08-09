@@ -328,6 +328,7 @@ class _ConversationCallScreenState extends State<ConversationCallScreen> impleme
             alignment: Alignment.bottomCenter,
             child: _getActionsPanel(),
           ),
+          
         ],
       ),
     );
@@ -341,7 +342,8 @@ class _ConversationCallScreenState extends State<ConversationCallScreen> impleme
             bottomLeft: Radius.circular(32),
             bottomRight: Radius.circular(32),
             topLeft: Radius.circular(32),
-            topRight: Radius.circular(32)),
+            topRight: Radius.circular(32)
+        ),
         child: Container(
           padding: EdgeInsets.all(4),
           color: Colors.black26,

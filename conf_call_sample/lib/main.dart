@@ -20,8 +20,10 @@ class _AppState extends State<App> {
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.green,
+        brightness: Brightness.dark,
       ),
       home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 
